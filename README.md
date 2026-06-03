@@ -12,3 +12,8 @@ This project is part of the final year project for Physics and Astronomy.
 - `/figures`: The output graphs by the scripts.
 - `/report`: The LaTeX files for the final report.
 - `/labjournal`: Our weekly meeting minutes, action lists, and decisions.
+
+
+## Overleaf integration
+
+-`overleaf commitments`: We have integrated Overleaf into Github for automatic commitments when we add new minutes it goes as a commitment from Jonas even if Coen makes a commitment from Overleaf.
