@@ -74,7 +74,7 @@ NIGHTS = {
 def inv_median(a):
     return 1 / np.median(a)
 
-
+RECALIBRATE = False
 all_calibrated = []
 
 for night, cfg in NIGHTS.items():
@@ -82,14 +82,32 @@ for night, cfg in NIGHTS.items():
     red_path = RED_DIR  / night
     red_path.mkdir(exist_ok=True)
 
+    if not RECALIBRATE:
+        for run in cfg["runs"]:
+            if not run_red.exists():
+                print(f" {night}/{run['label']}: no reduced set RECALIBRATE=True")
+                continue
+            for filt in FILTERS:
+                sci_glob = run["science_glob"].get(filt)
+                if not sci_glob:
+                    continue
+                files = sorted(run_red.glob(sci.glob))
+                if not files:
+                    continue
+                print(f"  {night}/{run['label']}/{filt}: {len(files)} reduced frames loaded")
+                for f in files: 
+                    ccd = CCDData.read(str(f), unit='adu')
+                    all_calibrated.append((night, run["label"], filt, f.name, ccd, ccd.header))
+        continue
+        
     print(f"\n{'='*60}")
     print(f"  Night: {night}")
     print(f"{'='*60}")
 
-    print(f"\n--- § 2.4  Combining bias images ---")
+    print(f"combining bias")
     bias_files = sorted(cal_path.glob(cfg["bias_glob"]))
     if not bias_files:
-        print(f"  WARNING: no bias files — skipping {night}")
+        print(f" no bias files skipping {night}")
         continue
 
     combined_bias = ccdp.combine(
@@ -105,7 +123,7 @@ for night, cfg in NIGHTS.items():
     print(f"  {len(bias_files)} bias frames -> combined_bias.fit")
 
 
-    print(f"\n--- § 3.6  Calibrating and combining dark frames ---")
+    print(f"Calibrating and combining dark frames ---")
     dark_files = sorted(cal_path.glob(cfg["dark_glob"]))
     if not dark_files:
         print(f"  WARNING: no dark files — skipping {night}")
@@ -134,7 +152,7 @@ for night, cfg in NIGHTS.items():
             print(f"\n  No flat files for filter {filt} in {night} — skipping filter")
             continue
 
-        print(f"\n--- § 5.3 / 5.4  Combining flat frames (filter: {filt}) ---")
+        print(f"Combining flat frames (filter: {filt}) ---")
         calibrated_flats = []
         for f in flat_files:
             ccd = CCDData.read(str(f), unit='adu')
@@ -157,7 +175,7 @@ for night, cfg in NIGHTS.items():
         combined_flats[filt] = combined_flat
         print(f"  {len(flat_files)} flat frames -> combined_flat_{filt}.fit")
 
-        # § 6.3  Calibrate science frames for every run in this filter
+        # Calibrate science frames 
         for run in cfg["runs"]:
             sci_glob = run["science_glob"].get(filt)
             if not sci_glob:
@@ -185,9 +203,9 @@ for night, cfg in NIGHTS.items():
 
 
 if not all_calibrated:
-    print("\nNo calibrated frames produced — check file paths.")
+    print("no calibrated frames produced — check file paths.")
 else:
-    print("\n\n=== Generating field maps (one per run) ===")
+    print("Generating field maps")
 
     seen_runs = set()
     for night, run_label, filt, fname, ccd, hdr in all_calibrated:
