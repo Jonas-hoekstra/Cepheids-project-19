@@ -7,7 +7,6 @@ This project is part of the final year project for Physics and Astronomy.
 
 ## Directory Structure
 
-- `/data`: Contains explanations of the cleaned datasets these are stored externally due to the size.
 - `/scripts`: Python code for reading data, fitting models, and generating plots.
 - `/figures`: The output graphs by the scripts.
 - `/report`: The LaTeX files for the final report.
