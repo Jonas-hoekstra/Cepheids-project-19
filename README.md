@@ -10,7 +10,7 @@ This project is part of the final year project for Physics and Astronomy.
 - `/scripts`: Python code for reading data, fitting models, and generating plots.
 - `/figures`: The output graphs by the scripts.
 - `/report`: The LaTeX files for the final report.
-- `/labjournal`: Our weekly meeting minutes, action lists, and decisions.
+- `/labjournal`: Our weekly meeting minutes, action lists, and decisions. (These are noted from day-to-day)
 
 
 ## Overleaf integration
